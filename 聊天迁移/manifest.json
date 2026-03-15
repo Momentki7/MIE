@@ -1,0 +1,22 @@
+{
+    "name": "MIE存档·创作工具",
+    "short_name": "MIE",
+    "description": "小手机存档管理与AI创作工具",
+    "start_url": "./index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#4a90e2",
+    "orientation": "portrait",
+    "icons": [
+        {
+            "src": "https://i.postimg.cc/rytY6WZ1/1773557119024.jpg",
+            "sizes": "192x192",
+            "type": "image/jpeg"
+        },
+        {
+            "src": "https://i.postimg.cc/rytY6WZ1/1773557119024.jpg",
+            "sizes": "512x512",
+            "type": "image/jpeg"
+        }
+    ]
+}
