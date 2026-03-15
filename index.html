@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MIE存档·创作工具</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a90e2">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="MIE">
+    <link rel="apple-touch-icon" href="https://i.postimg.cc/rytY6WZ1/1773557119024.jpg">
+</head>
+<body>
+
+    <div class="app-container">
+
+        <header class="app-header">
+            <div class="header-top">
+                <span class="header-logo">MIE</span>
+                <span class="header-sub"> 存档·创作工具</span>
+            </div>
+            <div class="header-tabs">
+                <button class="tab-btn active" data-page="library">存档库</button>
+                <button class="tab-btn" data-page="create">文字生成</button>
+                <button class="tab-btn" data-page="beautify">美化生成</button>
+                <button class="tab-btn" data-page="settings">设置</button>
+            </div>
+        </header>
+
+        <main class="app-main">
+
+            <!-- 存档库页面 -->
+            <section class="page active" id="page-library">
+                <div class="library-search-wrap">
+                    <div class="library-search-box">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <circle cx="11" cy="11" r="8"/>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        </svg>
+                        <input type="text" class="library-search-input" id="librarySearch" placeholder="搜索小手机..."/>
+                        <button class="library-search-clear" id="librarySearchClear">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"/>
+                                <line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="library-grid" id="libraryGrid"></div>
+
+                <!-- 详情弹窗 -->
+                <div class="lib-modal-mask" id="libModalMask">
+                    <div class="lib-modal" id="libModal">
+                        <div class="lib-modal-header">
+                            <img class="lib-modal-icon" id="libModalIcon" src="" alt=""/>
+                            <div class="lib-modal-info">
+                                <div class="lib-modal-name" id="libModalName"></div>
+                                <div class="lib-modal-date" id="libModalDate"></div>
+                            </div>
+                            <button class="lib-modal-close" id="libModalClose">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="lib-modal-url-row" id="libModalUrlRow">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+                                <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+                            </svg>
+                            <span id="libModalUrl" class="lib-url-text"></span>
+                            <button class="lib-url-open-btn" id="libUrlOpenBtn" title="打开链接">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                                    <polyline points="15 3 21 3 21 9"/>
+                                    <line x1="10" y1="14" x2="21" y2="3"/>
+                                </svg>
+                            </button>
+                        </div>
+
+                        <div class="lib-modal-actions">
+                            <button class="lib-action-btn" id="libImportBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                导入JSON
+                            </button>
+                            <button class="lib-action-btn" id="libExportBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                导出JSON
+                            </button>
+                        </div>
+
+                        <div class="lib-modal-actions lib-modal-actions-2">
+                            <button class="lib-action-btn lib-action-edit" id="libEditBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                                编辑信息
+                            </button>
+                            <button class="lib-action-btn lib-action-delete" id="libDeleteBtn">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                    <path d="M10 11v6M14 11v6"/>
+                                </svg>
+                                删除
+                            </button>
+                        </div>
+
+                        <div class="lib-modal-hint" id="libModalHint"></div>
+                    </div>
+                </div>
+
+                <!-- 新建弹窗 -->
+                <div class="lib-modal-mask" id="libNewMask">
+                    <div class="lib-modal" id="libNewModal">
+                        <div class="lib-modal-header">
+                            <span class="lib-modal-name">新建小手机</span>
+                            <button class="lib-modal-close" id="libNewClose">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="lib-icon-upload-wrap">
+                            <div class="lib-icon-upload" id="libIconUpload">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="4"/>
+                                    <line x1="12" y1="8" x2="12" y2="16"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                <span>上传图标</span>
+                            </div>
+                            <img class="lib-icon-preview" id="libIconPreview" src="" alt="" style="display:none"/>
+                        </div>
+                        <input type="file" id="libIconFile" accept="image/*" style="display:none"/>
+                        <div class="input-group">
+                            <label class="input-label">名字</label>
+                            <input type="text" class="input-field" id="libNewName" placeholder="小手机名字"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">链接（选填）</label>
+                            <input type="text" class="input-field" id="libNewUrl" placeholder="https://..."/>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="libNewSaveBtn">创建小手机</button>
+                    </div>
+                </div>
+
+                <!-- 编辑弹窗 -->
+                <div class="lib-modal-mask" id="libEditMask">
+                    <div class="lib-modal" id="libEditModal">
+                        <div class="lib-modal-header">
+                            <span class="lib-modal-name">编辑小手机</span>
+                            <button class="lib-modal-close" id="libEditClose">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="lib-icon-upload-wrap">
+                            <div class="lib-icon-upload" id="libEditIconUpload">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="3" y="3" width="18" height="18" rx="4"/>
+                                    <line x1="12" y1="8" x2="12" y2="16"/>
+                                    <line x1="8" y1="12" x2="16" y2="12"/>
+                                </svg>
+                                <span>更换图标</span>
+                            </div>
+                            <img class="lib-icon-preview" id="libEditIconPreview" src="" alt="" style="display:none"/>
+                        </div>
+                        <input type="file" id="libEditIconFile" accept="image/*" style="display:none"/>
+                        <div class="input-group">
+                            <label class="input-label">名字</label>
+                            <input type="text" class="input-field" id="libEditName" placeholder="名字"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">链接（选填）</label>
+                            <input type="text" class="input-field" id="libEditUrl" placeholder="https://..."/>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="libEditSaveBtn">保存修改</button>
+                    </div>
+                </div>
+
+                <input type="file" id="libJsonImport" accept=".json,.json.gz,.zip" style="display:none"/>
+            </section>
+
+            <!-- 文字生成页面 -->
+            <section class="page" id="page-create">
+                <div class="page-header">
+                    <h2 class="page-title">文字生成</h2>
+                </div>
+
+                <div class="create-tabs">
+                    <button class="create-tab-btn active" data-create="persona">人设卡</button>
+                    <button class="create-tab-btn" data-create="worldbook">世界书</button>
+                    <button class="create-tab-btn" data-create="doujin">同人梗</button>
+                    <button class="create-tab-btn" data-create="skit">小剧场</button>
+                </div>
+
+                <!-- 人设卡 -->
+                <div class="create-panel active" id="create-persona">
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label class="input-label">角色名字</label>
+                            <input type="text" id="personaName" class="input-field" placeholder="例：咚咚"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">年龄 / 性别</label>
+                            <input type="text" id="personaAge" class="input-field" placeholder="例：34岁，男"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">外貌关键词</label>
+                            <textarea id="personaAppearance" class="input-field textarea-sm" placeholder="例：冷白皮、狭长眼尾微挑、细框眼镜、深棕发"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">性格关键词</label>
+                            <textarea id="personaPersonality" class="input-field textarea-sm" placeholder="例：外表绝对理性、沦陷后没有底线、报复性极强"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">背景设定</label>
+                            <textarea id="personaBackground" class="input-field textarea-sm" placeholder="例：寒门出身，靠自己一路爬到顶，手下管着很多人"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">与User的关系</label>
+                            <input type="text" id="personaRelation" class="input-field" placeholder="例：你的上司，暗中喜欢你"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">生平经历关键词（可选）</label>
+                            <textarea id="personaHistory" class="input-field textarea-sm" placeholder="例：幼年丧父、军校出身、曾经背叛过最好的朋友"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">特殊设定（可选）</label>
+                            <textarea id="personaExtra" class="input-field textarea-sm" placeholder="例：有个秘密癖好、特殊口头禅、隐藏身份等"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <div class="persona-user-toggle">
+                                <label class="toggle-label">
+                                    <input type="checkbox" id="personaLinkUser"/>
+                                    <span class="toggle-text">与User产生关联（同步生成User人设）</span>
+                                </label>
+                            </div>
+                            <div id="personaUserRelBox" style="display:none; margin-top:8px;">
+                                <input type="text" id="personaUserRel" class="input-field" placeholder="例：你是他多年未见的青梅竹马、你是他的下属"/>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="personaGenerateBtn">✨ 生成人设卡</button>
+                    </div>
+                    <div class="create-result hidden" id="personaResult">
+                        <div class="result-header">
+                            <span class="result-title">生成结果</span>
+                            <button class="btn-icon" id="personaCopyBtn" title="复制">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result-content" id="personaContent"></div>
+                        <div class="iterate-box">
+                            <textarea id="personaIterateInput" class="input-field textarea-sm" placeholder="不满意？告诉我想改什么，例如：把性格写得更腹黑一点，加一个开场白"></textarea>
+                            <div class="iterate-btns">
+                                <button class="btn btn-outline" id="personaRegenBtn">🔄 重新生成</button>
+                                <button class="btn btn-primary" id="personaIterateBtn">✏️ 按要求修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 世界书 -->
+                <div class="create-panel hidden" id="create-worldbook">
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label class="input-label">世界书标题</label>
+                            <input type="text" id="wbTitle" class="input-field" placeholder="例：反霸总协议、现代都市规则"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">核心规则/想要的效果</label>
+                            <textarea id="wbCore" class="input-field textarea-md" placeholder="例：禁止霸道总裁刻板印象，AI需要用询问句替代命令句，尊重用户拒绝权"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">具体禁止/要求（可选）</label>
+                            <textarea id="wbRules" class="input-field textarea-sm" placeholder="例：禁止说"过来"，改成"能过来一下吗"；禁止物化称呼"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">适用场景</label>
+                            <input type="text" id="wbScene" class="input-field" placeholder="例：现代都市、古代宫廷、赛博朋克"/>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="wbGenerateBtn">✨ 生成世界书</button>
+                    </div>
+                    <div class="create-result hidden" id="wbResult">
+                        <div class="result-header">
+                            <span class="result-title">生成结果</span>
+                            <button class="btn-icon" id="wbCopyBtn" title="复制">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result-content" id="wbContent"></div>
+                        <div class="iterate-box">
+                            <textarea id="wbIterateInput" class="input-field textarea-sm" placeholder="想修改什么？例如：条目格式改成XML，再加一个正反例对比"></textarea>
+                            <div class="iterate-btns">
+                                <button class="btn btn-outline" id="wbRegenBtn">🔄 重新生成</button>
+                                <button class="btn btn-primary" id="wbIterateBtn">✏️ 按要求修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 同人梗 -->
+                <div class="create-panel hidden" id="create-doujin">
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label class="input-label">Char设定（简述）</label>
+                            <textarea id="doujinChar" class="input-field textarea-sm" placeholder="例：咚咚，34岁，商界大佬，外冷内热，对user沦陷后没有底线"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">同人梗关键词</label>
+                            <textarea id="doujinKeywords" class="input-field textarea-sm" placeholder="例：港文、温柔陷阱、伪叔侄、养成系、禁忌感"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">基调风格</label>
+                            <input type="text" id="doujinTone" class="input-field" placeholder="例：酸涩、甜甜的、有点黄、温馨喜剧"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">其他备注（可选）</label>
+                            <textarea id="doujinExtra" class="input-field textarea-sm" placeholder="例：结局一定要HE，不要写暴力，加入ABO元素"></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="doujinGenerateBtn">✨ 生成同人梗</button>
+                    </div>
+                    <div class="create-result hidden" id="doujinResult">
+                        <div class="result-header">
+                            <span class="result-title">生成结果</span>
+                            <button class="btn-icon" id="doujinCopyBtn" title="复制">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result-content" id="doujinContent"></div>
+                        <div class="iterate-box">
+                            <textarea id="doujinIterateInput" class="input-field textarea-sm" placeholder="想修改什么？例如：把背景改成古代，结局改成BE"></textarea>
+                            <div class="iterate-btns">
+                                <button class="btn btn-outline" id="doujinRegenBtn">🔄 重新生成</button>
+                                <button class="btn btn-primary" id="doujinIterateBtn">✏️ 按要求修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 小剧场 -->
+                <div class="create-panel hidden" id="create-skit">
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label class="input-label">Char设定（简述）</label>
+                            <textarea id="skitChar" class="input-field textarea-sm" placeholder="例：小A，22岁，A家大少爷，对user有严重的占有欲和迷恋"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">小剧场关键词</label>
+                            <textarea id="skitKeywords" class="input-field textarea-sm" placeholder="例：两苦瓜和好记、user变小了、醉酒表白、吃醋发疯、婚礼"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">基调风格</label>
+                            <input type="text" id="skitTone" class="input-field" placeholder="例：酸涩、甜甜的、温馨喜剧"/>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">字数要求</label>
+                            <select id="skitLength" class="input-field">
+                                <option value="5000">约5000字</option>
+                                <option value="8000" selected>约8000字</option>
+                                <option value="10000">约10000字</option>
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">其他要求（可选）</label>
+                            <textarea id="skitExtra" class="input-field textarea-sm" placeholder="例：不允许出现暴力词汇，文末需要甜蜜结尾"></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="skitGenerateBtn">✨ 生成小剧场指令</button>
+                    </div>
+                    <div class="create-result hidden" id="skitResult">
+                        <div class="result-header">
+                            <span class="result-title">生成结果（可直接粘贴到小手机）</span>
+                            <button class="btn-icon" id="skitCopyBtn" title="复制">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result-content" id="skitContent"></div>
+                        <div class="iterate-box">
+                            <textarea id="skitIterateInput" class="input-field textarea-sm" placeholder="想修改什么？例如：改成古代背景，字数加到10000字"></textarea>
+                            <div class="iterate-btns">
+                                <button class="btn btn-outline" id="skitRegenBtn">🔄 重新生成</button>
+                                <button class="btn btn-primary" id="skitIterateBtn">✏️ 按要求修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 美化生成页面 -->
+            <section class="page" id="page-beautify">
+                <div class="page-header">
+                    <h2 class="page-title">美化生成</h2>
+                </div>
+
+                <!-- 预览设置 -->
+                <div class="beautify-preview-settings">
+                    <div class="preview-settings-title">预览设置</div>
+                    <div class="preview-settings-row">
+                        <div class="preview-avatar-set">
+                            <div class="preview-avatar-upload" id="userAvatarUpload">
+                                <img id="userAvatarPreview" style="display:none"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <circle cx="12" cy="8" r="4"/>
+                                    <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                                </svg>
+                            </div>
+                            <input type="text" id="userNameInput" class="input-field" placeholder="用户名"/>
+                            <input type="text" id="userMsgInput" class="input-field" placeholder="用户示例消息"/>
+                            <input type="file" id="userAvatarFile" accept="image/*" style="display:none"/>
+                        </div>
+                        <div class="preview-avatar-set">
+                            <div class="preview-avatar-upload" id="charAvatarUpload">
+                                <img id="charAvatarPreview" style="display:none"/>
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <rect x="5" y="2" width="14" height="20" rx="3"/>
+                                    <line x1="9" y1="7" x2="15" y2="7"/>
+                                    <line x1="9" y1="11" x2="15" y2="11"/>
+                                </svg>
+                            </div>
+                            <input type="text" id="charNameInput" class="input-field" placeholder="Char名字"/>
+                            <input type="text" id="charMsgInput" class="input-field" placeholder="Char示例消息"/>
+                            <input type="file" id="charAvatarFile" accept="image/*" style="display:none"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="create-tabs">
+                    <button class="create-tab-btn active" data-beautify="bubble">气泡美化</button>
+                    <button class="create-tab-btn" data-beautify="html">HTML创作</button>
+                </div>
+
+                <!-- 气泡美化 -->
+                <div class="beautify-panel active" id="beautify-bubble">
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label class="input-label">上传CSS模板（可选）</label>
+                            <div class="css-upload-area" id="cssUploadArea">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="17 8 12 3 7 8"/>
+                                    <line x1="12" y1="3" x2="12" y2="15"/>
+                                </svg>
+                                <span id="cssUploadText">点击上传 CSS / TXT 文件</span>
+                                <input type="file" id="cssFile" accept=".css,.txt,.docx" style="display:none"/>
+                            </div>
+                            <textarea id="cssTemplateInput" class="input-field textarea-md" placeholder="或直接在这里粘贴CSS模板代码"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">想要的效果描述</label>
+                            <textarea id="bubbleDesc" class="input-field textarea-sm" placeholder="例：背景改成淡粉色，用户气泡圆角大一点，char气泡加个阴影，整体有质感"></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="bubbleGenerateBtn">✨ 生成CSS代码</button>
+                    </div>
+
+                    <div class="bubble-preview-title">效果预览</div>
+                    <iframe id="bubblePreviewFrame" class="bubble-preview-frame"></iframe>
+
+                    <div class="create-result hidden" id="bubbleResult">
+                        <div class="result-header">
+                            <span class="result-title">生成的CSS代码（复制到小手机）</span>
+                            <button class="btn-icon" id="bubbleCopyBtn" title="复制">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result-content code-content" id="bubbleContent"></div>
+                        <div class="iterate-box">
+                            <textarea id="bubbleIterateInput" class="input-field textarea-sm" placeholder="想调整什么？例如：气泡背景色改深一点，加个渐变"></textarea>
+                            <div class="iterate-btns">
+                                <button class="btn btn-outline" id="bubbleRegenBtn">🔄 重新生成</button>
+                                <button class="btn btn-primary" id="bubbleIterateBtn">✏️ 按要求修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HTML创作 -->
+                <div class="beautify-panel hidden" id="beautify-html">
+                    <div class="create-form">
+                        <div class="input-group">
+                            <label class="input-label">想创作什么HTML模块</label>
+                            <textarea id="htmlDesc" class="input-field textarea-md" placeholder="例：一个可以展开折叠的角色信息卡片，带动画效果，粉色主题"></textarea>
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">参考内容（可选）</label>
+                            <textarea id="htmlRef" class="input-field textarea-sm" placeholder="粘贴参考HTML代码或描述样式要求"></textarea>
+                        </div>
+                        <button class="btn btn-primary btn-full" id="htmlGenerateBtn">✨ 生成HTML</button>
+                    </div>
+
+                    <div class="create-result hidden" id="htmlResult">
+                        <div class="result-header">
+                            <span class="result-title">生成的HTML代码</span>
+                            <button class="btn-icon" id="htmlCopyBtn" title="复制">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="9" y="9" width="13" height="13" rx="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="result-content code-content" id="htmlContent"></div>
+
+                        <div class="bubble-preview-title">效果预览</div>
+                        <iframe id="htmlPreviewFrame" class="html-preview-frame"></iframe>
+
+                        <div class="iterate-box">
+                            <textarea id="htmlIterateInput" class="input-field textarea-sm" placeholder="想调整什么？例如：改成深色主题，加个复制按钮"></textarea>
+                            <div class="iterate-btns">
+                                <button class="btn btn-outline" id="htmlRegenBtn">🔄 重新生成</button>
+                                <button class="btn btn-primary" id="htmlIterateBtn">✏️ 按要求修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 设置页面 -->
+            <section class="page" id="page-settings">
+                <div class="ios-section-header">预设配置</div>
+                <div class="ios-group">
+                    <div class="ios-cell">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                                <path d="M2 17l10 5 10-5"/>
+                                <path d="M2 12l10 5 10-5"/>
+                            </svg>
+                            <span>选择预设</span>
+                        </div>
+                        <select class="ios-select" id="presetSelect">
+                            <option value="">未选择</option>
+                        </select>
+                    </div>
+                    <div class="ios-cell-divider"></div>
+                    <div class="ios-cell ios-cell-danger" id="deletePresetBtn">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                <path d="M10 11v6M14 11v6"/>
+                            </svg>
+                            <span>删除当前预设</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ios-section-header">API 配置</div>
+                <div class="ios-group">
+                    <div class="ios-cell ios-cell-input">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="2" y1="12" x2="22" y2="12"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                            <span>URL</span>
+                        </div>
+                        <input type="text" class="ios-input-right" id="apiUrl" placeholder="https://api.example.com/v1"/>
+                    </div>
+                    <div class="ios-cell-divider"></div>
+                    <div class="ios-cell ios-cell-input">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                            </svg>
+                            <span>Key</span>
+                        </div>
+                        <div class="ios-input-right-wrap">
+                            <input type="password" class="ios-input-right" id="apiKey" placeholder="sk-xxxxxxxx"/>
+                            <button class="ios-eye-btn" id="toggleApiKey">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ios-section-header">模型选择</div>
+                <div class="ios-group">
+                    <div class="ios-cell ios-cell-input">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                            <span>模型</span>
+                        </div>
+                        <select class="ios-select ios-select-right" id="modelSelect">
+                            <option value="">请先拉取</option>
+                        </select>
+                    </div>
+                    <div class="ios-cell-divider"></div>
+                    <div class="ios-cell ios-cell-action" id="fetchModelsBtn">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <polyline points="23 4 23 10 17 10"/>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                            </svg>
+                            <span>拉取模型列表</span>
+                        </div>
+                        <svg class="ios-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="ios-cell-hint" id="modelFetchHint"></div>
+
+                <div class="ios-section-header">保存为新预设</div>
+                <div class="ios-group">
+                    <div class="ios-cell ios-cell-input">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <line x1="12" y1="5" x2="12" y2="19"/>
+                                <line x1="5" y1="12" x2="19" y2="12"/>
+                            </svg>
+                            <span>名称</span>
+                        </div>
+                        <input type="text" class="ios-input-right" id="presetName" placeholder="给这组配置取个名字"/>
+                    </div>
+                    <div class="ios-cell-divider"></div>
+                    <div class="ios-cell ios-cell-action ios-cell-blue" id="savePresetBtn">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                <polyline points="17 21 17 13 7 13 7 21"/>
+                                <polyline points="7 3 7 8 15 8"/>
+                            </svg>
+                            <span>保存预设</span>
+                        </div>
+                        <svg class="ios-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="ios-section-header">系统数据</div>
+                <div class="ios-group">
+                    <div class="ios-cell ios-cell-action" id="systemExportBtn">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            <span>整体导出备份</span>
+                        </div>
+                        <svg class="ios-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </div>
+                    <div class="ios-cell-divider"></div>
+                    <div class="ios-cell ios-cell-action" id="systemImportBtn">
+                        <div class="ios-cell-left">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="17 8 12 3 7 8"/>
+                                <line x1="12" y1="3" x2="12" y2="15"/>
+                            </svg>
+                            <span>整体导入备份</span>
+                        </div>
+                        <svg class="ios-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"/>
+                        </svg>
+                    </div>
+                </div>
+                <input type="file" id="systemImportFile" accept=".json" style="display:none"/>
+
+                <div style="height: 20px;"></div>
+            </section>
+
+        </main>
+    </div>
+
+    <script src="jszip.min.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
