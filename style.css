@@ -2292,3 +2292,11 @@ body {
 .toggle-text {
     line-height: 1.4;
 }
+
+/* ===== 访问统计 ===== */
+.busuanzi-wrap {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-light);
+    padding: 12px 0 20px;
+}
